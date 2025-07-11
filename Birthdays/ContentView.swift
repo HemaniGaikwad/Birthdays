@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     //@state means updating information automatically as the app is running
@@ -13,14 +14,13 @@ struct ContentView: View {
     @State private var newBirthday = Date.now
     
     //friends array
-    @State private var friends: [Friend] = [
-        Friend(name: "Nicole", birthday: .now),
-        Friend(name: "Geetika", birthday: .now)
-    ]
+    //fetches data stored in friends class
+    @Query private var friends: [Friend]
+    @Environment(\.modelContext) private var context
     
     var body: some View {
         NavigationStack {
-        List (friends, id: \.name) {friend in
+        List (friends) {friend in
             HStack {
                 Text(friend.name)
                 Spacer()
@@ -41,7 +41,7 @@ struct ContentView: View {
                     
                     Button("Save"){
                         let newFriend = Friend(name: newName, birthday: newBirthday)
-                        friends.append(newFriend)
+                        context.insert(newFriend)
                         //reset
                         newName = ""
                         newBirthday = .now
@@ -60,4 +60,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+    //allows data to perserve in the phone and preview
+        .modelContainer(for: Friend.self, inMemory: true)
 }
